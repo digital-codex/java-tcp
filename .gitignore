@@ -1,10 +1,13 @@
 !.mvn/wrapper/maven-wrapper.jar
-target/
-!**/src/main/**/target/
-!**/src/test/**/target/
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
 lib/
 !**/src/main/**/lib/
 !**/src/test/**/lib/
+target/
+!**/src/main/**/target/
+!**/src/test/**/target/
 
 ### IntelliJ IDEA ###
 .idea
