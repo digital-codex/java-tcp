@@ -8,10 +8,7 @@
  * mode - 1 = TUN, 2 = TAP.
  * packet_info - if packet info should be provided, if the given value is 0 it will not prepend packet info.
  */
-JNIEXPORT jint JNICALL Java_dev_codex_system_LibCWrapper_ioctl(JNIEnv *env, jclass this, jint fd, jbyteArray name, jint mode) {
-	jbyte *_name = (jbyte *) (*env)->GetByteArrayElements(env, name, NULL);
-	printf("%s\n", _name);
-	_name[0] = 'h';
-	(*env)->ReleaseByteArrayElements(env, name, _name, 0);
+JNIEXPORT jint JNICALL Java_dev_codex_system_LibCWrapper_ioctl(JNIEnv *env, jclass this, jint fd, jlong request, jlong arg) {
+	printf("Hello, World!\n");
 	return 0;
 }

@@ -5,5 +5,5 @@ public class LibCWrapper {
         System.loadLibrary("cwrapper");
     }
 
-    public static native int ioctl(int fd, byte[] name, int flag);
+    public static native int ioctl(int fd, long request, long arg);
 }
