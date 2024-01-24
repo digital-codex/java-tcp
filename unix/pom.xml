@@ -62,7 +62,7 @@
                                     <arg value="./target/library" />
                                 </exec>
                                 <exec executable="make" failonerror="true">
-                                    <arg value="libcwrapper.so" />
+                                    <arg value="all" />
                                 </exec>
                             </target>
                         </configuration>

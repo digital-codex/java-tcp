@@ -1,14 +1,35 @@
 #include <dev_codex_system_LibCWrapper.h>
-#include <stdio.h>
 
-/**
- * fd - the fc to turn into TUN or TAP
- * name - the name to use. If empty, kernel will assign something by itself.
- *     Must be buffered with capacity at least 33.
- * mode - 1 = TUN, 2 = TAP.
- * packet_info - if packet info should be provided, if the given value is 0 it will not prepend packet info.
- */
-JNIEXPORT jint JNICALL Java_dev_codex_system_LibCWrapper_ioctl(JNIEnv *env, jclass this, jint fd, jlong request, jlong arg) {
-	printf("Hello, World!\n");
-	return 0;
+#include <unistd.h>
+#include <linux/if.h>
+#include <linux/if_tun.h>
+
+#include <sys/ioctl.h>
+#include <fcntl.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+JNIEXPORT jint JNICALL Java_dev_codex_system_LibCWrapper_open(JNIEnv *env, jclass class, jstring path, jint flags) {
+	const char *pathname = (const char *) (*env)->GetStringChars(env, path, NULL);
+	int result = open(pathname, flags);
+	(*env)->ReleaseStringChars(env, path, (const unsigned short *) pathname);
+	return result;
 }
+
+JNIEXPORT jint JNICALL Java_dev_codex_system_LibCWrapper_close(JNIEnv *env, jclass class, jint fd) {
+	return close(fd);
+}
+
+JNIEXPORT jlong JNICALL Java_dev_codex_system_LibCWrapper_TUNSETIFF(JNIEnv *env, jclass class) {
+	return TUNSETIFF;
+}
+
+JNIEXPORT jint JNICALL Java_dev_codex_system_LibCWrapper_ioctl(JNIEnv *env, jclass class, jint fd, jlong request, jlong arg) {
+	return ioctl(fd, request, (struct ifreq *) arg);
+}
+
+#ifdef __cplusplus
+}
+#endif
