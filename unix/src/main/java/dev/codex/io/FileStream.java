@@ -68,6 +68,20 @@ public class FileStream implements AutoCloseable {
         }
     }
 
+    public int read(byte[] bytes) throws IOException {
+        if (!this.isOpen())
+            throw new IOException("File " + this.path + " is not open");
+
+        if (!this.mode.canRead())
+            throw new IOException("File " + this.path + " is open in WRITE_ONLY mode");
+
+        int read = LibCWrapper.read(this.fd, bytes, bytes.length);
+        if (read == -1) {
+            throw new IOException("Exception occurred while reading from the file: " + LibCWrapper.strerror());
+        }
+        return read;
+    }
+
     public String path() {
         return this.path;
     }

@@ -13,6 +13,8 @@ public class LibCWrapper {
 
     public static native int write(int fd, byte[] buf, int count);
 
+    public static native int read(int fd, byte[] buf, int count);
+
     public static final String TUN_PATH = "/dev/net/tun";
 
     //TODO: should recreate this in java

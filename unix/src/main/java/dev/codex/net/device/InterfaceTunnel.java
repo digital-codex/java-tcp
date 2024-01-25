@@ -55,7 +55,9 @@ public class InterfaceTunnel implements AutoCloseable {
 
     public static void main(String[] args) throws Exception {
         FileStream fs = new FileStream("/home/treyvon/src/tcp/unix/src/main/resources/test.txt", AccessMode.READ_WRITE).open();
-        fs.write(new byte[]{'H', 'e', 'l', 'l', 'o', ',', ' ', 'W', 'o', 'r', 'l', 'd'});
+        byte[] buf = new byte[20];
+        int read = fs.read(buf);
+        System.out.printf("Read %d bytes: %s%n", read, new String(buf));
         fs.close();
     }
 

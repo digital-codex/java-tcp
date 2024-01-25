@@ -1,13 +1,14 @@
 #include <dev_codex_system_LibCWrapper.h>
 
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include <errno.h>
 #include<string.h>
-#include <unistd.h>
+
 #include <linux/if.h>
 #include <linux/if_tun.h>
-
 #include <sys/ioctl.h>
-#include <fcntl.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,6 +42,13 @@ JNIEXPORT jint JNICALL Java_dev_codex_system_LibCWrapper_write(JNIEnv *env, jcla
 	char *buf = (char *) (*env)->GetByteArrayElements(env, buffer, NULL);
 	int result = write(fd, buf, count);
 	(*env)->ReleaseByteArrayElements(env, buffer, (jbyte *) buf, JNI_ABORT);
+	return result;
+}
+
+JNIEXPORT jint JNICALL Java_dev_codex_system_LibCWrapper_read(JNIEnv *env, jclass class, jint fd, jbyteArray buffer, jint count) {
+	char *buf = (char *) malloc(count * sizeof(char));
+	int result = read(fd, buf, count);
+	(*env)->SetByteArrayRegion(env, buffer, 0, count, (const jbyte *) buf);
 	return result;
 }
 
