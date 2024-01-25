@@ -6,24 +6,24 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class UnixFileStream implements AutoCloseable {
+public class FileStream implements AutoCloseable {
     private String path;
     private AccessMode mode;
     private int fd;
 
-    public UnixFileStream(String name) throws FileNotFoundException, NullPointerException {
+    public FileStream(String name) throws FileNotFoundException, NullPointerException {
         this(name != null ? new File(name) : null, AccessMode.READ_ONLY);
     }
 
-    public UnixFileStream(String name, AccessMode mode) throws FileNotFoundException, NullPointerException {
+    public FileStream(String name, AccessMode mode) throws FileNotFoundException, NullPointerException {
         this(name != null ? new File(name) : null, mode);
     }
 
-    public UnixFileStream(File file) throws FileNotFoundException, NullPointerException {
+    public FileStream(File file) throws FileNotFoundException, NullPointerException {
         this(file, AccessMode.READ_ONLY);
     }
 
-    public UnixFileStream(File file, AccessMode mode) throws FileNotFoundException, NullPointerException {
+    public FileStream(File file, AccessMode mode) throws FileNotFoundException, NullPointerException {
         String path = file != null ? file.getPath() : null;
         if (path == null) {
             throw new NullPointerException();
@@ -37,7 +37,7 @@ public class UnixFileStream implements AutoCloseable {
         this.fd = -1;
     }
 
-    public UnixFileStream open() {
+    public FileStream open() {
         this.fd = LibCWrapper.open(this.path, this.mode.flag());
         return this;
     }

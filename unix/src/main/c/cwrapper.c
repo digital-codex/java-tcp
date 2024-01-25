@@ -1,5 +1,6 @@
 #include <dev_codex_system_LibCWrapper.h>
 
+#include <errno.h>
 #include <unistd.h>
 #include <linux/if.h>
 #include <linux/if_tun.h>
@@ -12,9 +13,9 @@ extern "C" {
 #endif
 
 JNIEXPORT jint JNICALL Java_dev_codex_system_LibCWrapper_open(JNIEnv *env, jclass class, jstring path, jint flags) {
-	const char *pathname = (const char *) (*env)->GetStringChars(env, path, NULL);
+	const char *pathname = (*env)->GetStringUTFChars(env, path, NULL);
 	int result = open(pathname, flags);
-	(*env)->ReleaseStringChars(env, path, (const unsigned short *) pathname);
+	(*env)->ReleaseStringUTFChars(env, path, pathname);
 	return result;
 }
 
@@ -27,7 +28,7 @@ JNIEXPORT jlong JNICALL Java_dev_codex_system_LibCWrapper_TUNSETIFF(JNIEnv *env,
 }
 
 JNIEXPORT jint JNICALL Java_dev_codex_system_LibCWrapper_ioctl(JNIEnv *env, jclass class, jint fd, jlong request, jlong arg) {
-	return ioctl(fd, request, (struct ifreq *) arg);
+	return ioctl(fd, request, arg);
 }
 
 #ifdef __cplusplus
