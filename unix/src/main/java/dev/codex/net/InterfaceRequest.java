@@ -3,7 +3,7 @@ package dev.codex.net;
 public class InterfaceRequest implements AutoCloseable {
 
     static {
-        System.loadLibrary("interface");
+        System.loadLibrary("request");
     }
 
     private final long address;

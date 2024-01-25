@@ -32,13 +32,21 @@ public class InterfaceTunnel implements AutoCloseable {
                 ifr.setFlags(RequestFlags.IFF_NO_PI);
             }
             if (LibCWrapper.ioctl(this.file.fd(), LibCWrapper.TUNSETIFF(), ifr.getAddress()) < 0) {
-                throw new IOException("Exception occurred while setting up interface tunnel " + LibCWrapper.strerror());
+                throw new IOException("Exception occurred while setting up interface tunnel: " + LibCWrapper.strerror());
             }
 
             this.name = new String(ifr.getName());
         } catch (Exception e) {
             throw new IOException(e);
         }
+    }
+
+    public int send(byte[] bytes) throws IOException {
+        return this.file.write(bytes);
+    }
+
+    public int recv(byte[] bytes) throws IOException {
+        return this.file.read(bytes);
     }
 
     public FileStream fd() {
@@ -54,11 +62,13 @@ public class InterfaceTunnel implements AutoCloseable {
     }
 
     public static void main(String[] args) throws Exception {
-        FileStream fs = new FileStream("/home/treyvon/src/tcp/unix/src/main/resources/test.txt", AccessMode.READ_WRITE).open();
-        byte[] buf = new byte[20];
-        int read = fs.read(buf);
-        System.out.printf("Read %d bytes: %s%n", read, new String(buf));
-        fs.close();
+        try (InterfaceTunnel nic = new InterfaceTunnel("tun0", RequestMode.TUN)) {
+            byte[] buf = new byte[1504];
+            int read = nic.recv(buf);
+            System.out.printf("Read %d bytes: %s", read, new String(buf));
+        } catch (Exception e) {
+            e.printStackTrace(System.out);
+        }
     }
 
     @Override

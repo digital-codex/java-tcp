@@ -37,8 +37,11 @@ public class FileStream implements AutoCloseable {
         this.fd = -1;
     }
 
-    public FileStream open() {
+    public FileStream open() throws IOException {
         this.fd = LibCWrapper.open(this.path, this.mode.flag());
+        if (fd < 0) {
+            throw new IOException("Exception occurred while opening the file: " + LibCWrapper.strerror());
+        }
         return this;
     }
 
@@ -56,16 +59,18 @@ public class FileStream implements AutoCloseable {
         }
     }
 
-    public void write(byte[] bytes) throws IOException {
+    public int write(byte[] bytes) throws IOException {
         if (!this.isOpen())
             throw new IOException("File " + this.path + " is not open");
 
         if (!this.mode.canWrite())
             throw new IOException("File " + this.path + " is open in READ_ONLY mode");
 
-        if (LibCWrapper.write(this.fd, bytes, bytes.length) < 0) {
+        int write = LibCWrapper.write(this.fd, bytes, bytes.length);
+        if (write < 0) {
             throw new IOException("Exception occurred while writing to the file: " + LibCWrapper.strerror());
         }
+        return write;
     }
 
     public int read(byte[] bytes) throws IOException {
@@ -76,7 +81,7 @@ public class FileStream implements AutoCloseable {
             throw new IOException("File " + this.path + " is open in WRITE_ONLY mode");
 
         int read = LibCWrapper.read(this.fd, bytes, bytes.length);
-        if (read == -1) {
+        if (read < 0) {
             throw new IOException("Exception occurred while reading from the file: " + LibCWrapper.strerror());
         }
         return read;

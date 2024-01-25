@@ -57,6 +57,9 @@ JNIEXPORT jlong JNICALL Java_dev_codex_system_LibCWrapper_TUNSETIFF(JNIEnv *env,
 }
 
 JNIEXPORT jint JNICALL Java_dev_codex_system_LibCWrapper_ioctl(JNIEnv *env, jclass class, jint fd, jlong request, jlong arg) {
+	printf("fd: %d\n", fd);
+	printf("name: %s\n", ((struct ifreq *) arg)->ifr_name);
+	printf("flags: %d\n", ((struct ifreq *) arg)->ifr_flags);
 	return ioctl(fd, request, arg);
 }
 
