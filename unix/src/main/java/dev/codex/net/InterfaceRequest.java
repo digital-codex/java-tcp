@@ -30,4 +30,10 @@ public class InterfaceRequest implements AutoCloseable {
     }
 
     private native void free();
+
+    private static native void init();
+
+    static {
+        InterfaceRequest.init();
+    }
 }

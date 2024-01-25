@@ -1,20 +1,20 @@
 package dev.codex.net.device;
 
 import dev.codex.io.AccessMode;
-import dev.codex.io.UnixFileStream;
+import dev.codex.io.FileStream;
 import dev.codex.net.InterfaceRequest;
 import dev.codex.system.LibCWrapper;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-public class InterfaceTunnel {
+public class InterfaceTunnel implements AutoCloseable {
 
     static {
         System.loadLibrary("cwrapper");
     }
 
-    private final UnixFileStream fd;
+    private final FileStream fd;
     private final String name;
     private final RequestMode mode;
 
@@ -24,7 +24,8 @@ public class InterfaceTunnel {
 
     public InterfaceTunnel(String name, RequestMode mode, boolean packet_info) throws IOException {
         try (InterfaceRequest ifr = new InterfaceRequest()) {
-            this.fd = new UnixFileStream(LibCWrapper.TUN_PATH, AccessMode.READ_WRITE).open();
+            this.fd = new FileStream(LibCWrapper.TUN_PATH, AccessMode.READ_WRITE).open();
+            this.mode = mode;
             ifr.setName(name.getBytes(Charset.defaultCharset()));
             ifr.setFlags(mode.flag());
             if (packet_info) {
@@ -36,13 +37,12 @@ public class InterfaceTunnel {
             }
 
             this.name = new String(ifr.getName());
-            this.mode = mode;
         } catch (Exception e) {
             throw new IOException(e);
         }
     }
 
-    public UnixFileStream fd() {
+    public FileStream fd() {
         return this.fd;
     }
 
@@ -54,13 +54,14 @@ public class InterfaceTunnel {
         return this.mode;
     }
 
-    public static void main(String[] args) {
-        InterfaceRequest ifr = new InterfaceRequest();
-        ifr.setName("Hello, World!".getBytes(Charset.defaultCharset()));
-        ifr.setFlags(RequestMode.TUN.flag());
-        ifr.setFlags(RequestFlags.IFF_NO_PI);
-        System.out.println(new String(ifr.getName()).trim());
-        System.out.println(ifr.getFlags());
-        ifr.close();
+    public static void main(String[] args) throws Exception {
+        InterfaceTunnel nic = new InterfaceTunnel("tun0", RequestMode.TUN);
+        System.out.println(nic.name());
+        nic.close();
+    }
+
+    @Override
+    public void close() throws Exception {
+        this.fd.close();
     }
 }

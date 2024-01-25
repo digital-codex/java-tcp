@@ -9,8 +9,10 @@
 extern "C" {
 #endif
 
+static jfieldID field;
+
 static struct ifreq *address(JNIEnv *env, jobject this) {
-	return (struct ifreq *) (*env)->GetLongField(env, this, (*env)->GetFieldID(env, (*env)->GetObjectClass(env, this), "address", "J"));
+	return (struct ifreq *) (*env)->GetLongField(env, this, field);
 }
 
 JNIEXPORT jlong JNICALL Java_dev_codex_net_InterfaceRequest_allocate(JNIEnv *env, jobject this) {
@@ -21,7 +23,7 @@ JNIEXPORT jlong JNICALL Java_dev_codex_net_InterfaceRequest_allocate(JNIEnv *env
 }
 
 JNIEXPORT jbyteArray JNICALL Java_dev_codex_net_InterfaceRequest_getName(JNIEnv *env, jobject this) {
-	const char name[IFNAMSIZ] = {0};
+	char name[IFNAMSIZ] = {0};
 	strncpy((char *) name, (address(env, this))->ifr_name, IFNAMSIZ);
 	jbyteArray name_array = (*env)->NewByteArray(env, IFNAMSIZ);
 	(*env)->SetByteArrayRegion(env, name_array, 0, IFNAMSIZ, (const jbyte *) name);
@@ -42,6 +44,10 @@ JNIEXPORT void JNICALL Java_dev_codex_net_InterfaceRequest_setFlags(JNIEnv *env,
 
 JNIEXPORT void JNICALL Java_dev_codex_net_InterfaceRequest_free(JNIEnv *env, jobject this) {
 	free(address(env, this));
+}
+
+JNIEXPORT void JNICALL Java_dev_codex_net_InterfaceRequest_init(JNIEnv *env, jclass class) {
+	field = (*env)->GetFieldID(env, class, "address", "J");
 }
 
 #ifdef __cplusplus
