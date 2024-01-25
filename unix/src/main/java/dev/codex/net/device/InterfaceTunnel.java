@@ -14,7 +14,7 @@ public class InterfaceTunnel implements AutoCloseable {
         System.loadLibrary("cwrapper");
     }
 
-    private final FileStream fd;
+    private final FileStream file;
     private final String name;
     private final RequestMode mode;
 
@@ -24,16 +24,15 @@ public class InterfaceTunnel implements AutoCloseable {
 
     public InterfaceTunnel(String name, RequestMode mode, boolean packet_info) throws IOException {
         try (InterfaceRequest ifr = new InterfaceRequest()) {
-            this.fd = new FileStream(LibCWrapper.TUN_PATH, AccessMode.READ_WRITE).open();
+            this.file = new FileStream(LibCWrapper.TUN_PATH, AccessMode.READ_WRITE).open();
             this.mode = mode;
             ifr.setName(name.getBytes(Charset.defaultCharset()));
             ifr.setFlags(mode.flag());
             if (packet_info) {
                 ifr.setFlags(RequestFlags.IFF_NO_PI);
             }
-            int err;
-            if ((err = LibCWrapper.ioctl(this.fd.getFd(), LibCWrapper.TUNSETIFF(), ifr.getAddress())) < 0) {
-                throw new IOException("Error in ioctl: " + err);
+            if (LibCWrapper.ioctl(this.file.fd(), LibCWrapper.TUNSETIFF(), ifr.getAddress()) < 0) {
+                throw new IOException("Exception occurred while setting up interface tunnel " + LibCWrapper.strerror());
             }
 
             this.name = new String(ifr.getName());
@@ -43,7 +42,7 @@ public class InterfaceTunnel implements AutoCloseable {
     }
 
     public FileStream fd() {
-        return this.fd;
+        return this.file;
     }
 
     public String name() {
@@ -55,13 +54,13 @@ public class InterfaceTunnel implements AutoCloseable {
     }
 
     public static void main(String[] args) throws Exception {
-        InterfaceTunnel nic = new InterfaceTunnel("tun0", RequestMode.TUN);
-        System.out.println(nic.name());
-        nic.close();
+        FileStream fs = new FileStream("/home/treyvon/src/tcp/unix/src/main/resources/test.txt", AccessMode.READ_WRITE).open();
+        fs.write(new byte[]{'H', 'e', 'l', 'l', 'o', ',', ' ', 'W', 'o', 'r', 'l', 'd'});
+        fs.close();
     }
 
     @Override
     public void close() throws Exception {
-        this.fd.close();
+        this.file.close();
     }
 }

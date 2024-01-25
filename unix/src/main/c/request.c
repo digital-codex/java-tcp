@@ -24,14 +24,16 @@ JNIEXPORT jlong JNICALL Java_dev_codex_net_InterfaceRequest_allocate(JNIEnv *env
 
 JNIEXPORT jbyteArray JNICALL Java_dev_codex_net_InterfaceRequest_getName(JNIEnv *env, jobject this) {
 	char name[IFNAMSIZ] = {0};
-	strncpy((char *) name, (address(env, this))->ifr_name, IFNAMSIZ);
+	strncpy(name, (address(env, this))->ifr_name, IFNAMSIZ);
 	jbyteArray name_array = (*env)->NewByteArray(env, IFNAMSIZ);
 	(*env)->SetByteArrayRegion(env, name_array, 0, IFNAMSIZ, (const jbyte *) name);
 	return name_array;
 }
 
 JNIEXPORT void JNICALL Java_dev_codex_net_InterfaceRequest_setName(JNIEnv *env, jobject this, jbyteArray name) {
-	strncpy((address(env, this))->ifr_name, (char *) (*env)->GetByteArrayElements(env, name, NULL), IFNAMSIZ);
+	char *buf = (char *) (*env)->GetByteArrayElements(env, name, NULL);
+	strncpy((address(env, this))->ifr_name, buf, IFNAMSIZ);
+	(*env)->ReleaseByteArrayElements(env, name, (jbyte *) buf, JNI_ABORT);
 }
 
 JNIEXPORT jshort JNICALL Java_dev_codex_net_InterfaceRequest_getFlags(JNIEnv *env, jobject this) {
