@@ -1,5 +1,6 @@
 package dev.codex.io;
 
+import dev.codex.java.wrapper.runtime.AccessMode;
 import dev.codex.system.LibCWrapper;
 
 import java.io.File;
@@ -38,7 +39,7 @@ public class FileStream implements AutoCloseable {
     }
 
     public FileStream open() throws IOException {
-        this.fd = LibCWrapper.open(this.path, this.mode.flag());
+        this.fd = LibCWrapper.open(this.path, this.mode.value());
         if (fd < 0) {
             throw new IOException("Exception occurred while opening the file: " + LibCWrapper.strerror());
         }
@@ -63,7 +64,7 @@ public class FileStream implements AutoCloseable {
         if (!this.isOpen())
             throw new IOException("File " + this.path + " is not open");
 
-        if (!this.mode.canWrite())
+        if (this.mode == AccessMode.READ_ONLY)
             throw new IOException("File " + this.path + " is open in READ_ONLY mode");
 
         int write = LibCWrapper.write(this.fd, bytes, bytes.length);
@@ -77,7 +78,7 @@ public class FileStream implements AutoCloseable {
         if (!this.isOpen())
             throw new IOException("File " + this.path + " is not open");
 
-        if (!this.mode.canRead())
+        if (this.mode == AccessMode.WRITE_ONLY)
             throw new IOException("File " + this.path + " is open in WRITE_ONLY mode");
 
         int read = LibCWrapper.read(this.fd, bytes, bytes.length);

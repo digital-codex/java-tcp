@@ -1,7 +1,7 @@
 package dev.codex.net.device;
 
-import dev.codex.io.AccessMode;
 import dev.codex.io.FileStream;
+import dev.codex.java.wrapper.runtime.AccessMode;
 import dev.codex.net.InterfaceRequest;
 import dev.codex.system.LibCWrapper;
 
