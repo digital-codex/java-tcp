@@ -1,6 +1,7 @@
 package dev.codex.io;
 
 import dev.codex.java.wrapper.runtime.AccessMode;
+import dev.codex.java.wrapper.runtime.CRuntimeWrapper;
 import dev.codex.system.LibCWrapper;
 
 import java.io.File;
@@ -39,7 +40,7 @@ public class FileStream implements AutoCloseable {
     }
 
     public FileStream open() throws IOException {
-        this.fd = LibCWrapper.open(this.path, this.mode.value());
+        this.fd = CRuntimeWrapper.open(this.path, this.mode);
         if (fd < 0) {
             throw new IOException("Exception occurred while opening the file: " + LibCWrapper.strerror());
         }
@@ -52,12 +53,13 @@ public class FileStream implements AutoCloseable {
 
     @Override
     public void close() throws IOException {
-        if (this.isOpen()) {
-            if (LibCWrapper.close(this.fd) < 0) {
-                throw new IOException("Exception occurred while closing the file: " + LibCWrapper.strerror());
-            }
-            this.fd = -1;
+        if (!this.isOpen())
+            return;
+
+        if (CRuntimeWrapper.close(this.fd) < 0) {
+            throw new IOException("Exception occurred while closing the file: " + LibCWrapper.strerror());
         }
+        this.fd = -1;
     }
 
     public int write(byte[] bytes) throws IOException {
