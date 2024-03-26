@@ -4,14 +4,19 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>dev.codex.io</groupId>
+    <parent>
+        <groupId>dev.codex.java.maven</groupId>
+        <artifactId>parent-jar-packaging</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>dev.codex.java</groupId>
     <artifactId>tcp</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>17</java.version>
+        <file.encoding>UTF-8</file.encoding>
     </properties>
 
     <dependencies>

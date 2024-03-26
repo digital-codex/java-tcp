@@ -1,44 +1,40 @@
 package dev.codex.java.device.network;
 
 import dev.codex.java.wrapper.runtime.*;
-import dev.codex.java.wrapper.runtime.InterfaceRequest;
 import dev.codex.java.wrapper.type.Error;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 
-import static dev.codex.java.wrapper.runtime.NetworkTunnelRequestFlag.*;
+import static dev.codex.java.wrapper.runtime.NetworkTunnelInterfaceFlag.NO_PACKET_INFORMATION;
 
 public class NetworkTunnel implements AutoCloseable {
     private final FileDescriptor file;
     private final String name;
-    private final RequestMode mode;
+    private final NetworkTunnelDeviceFlag device;
 
-    public NetworkTunnel(String name, RequestMode mode) throws IOException {
-        this(name, mode, true);
+    public NetworkTunnel(String name, NetworkTunnelDeviceFlag device) throws Error {
+        this(name, device, true);
     }
 
-    public NetworkTunnel(String name, RequestMode mode, boolean packet_info) throws IOException {
-        try (dev.codex.java.wrapper.runtime.InterfaceRequest ifr = CRuntimeWrapper.malloc(InterfaceRequest.class)) {
+    public NetworkTunnel(String name, NetworkTunnelDeviceFlag device, boolean packet_info) throws Error {
+        try (InterfaceRequest ifr = CRuntimeWrapper.malloc(InterfaceRequest.class)) {
             this.file = CRuntimeWrapper.open("/dev/net/tun", AccessFlag.READ_WRITE);
             this.name = name;
-            this.mode = mode;
+            this.device = device;
             ifr.setName(name.getBytes(Charset.defaultCharset()));
-            ifr.addFlag(mode);
+            ifr.addFlag(device);
             if (packet_info) {
                 ifr.addFlag(NO_PACKET_INFORMATION);
             }
-            CRuntimeWrapper.ioctl(this.file, RequestCode.TUNSETIFF, ifr);
-        } catch (Error e) {
-            throw new IOException("Failed to initialize network tunnel");
+            CRuntimeWrapper.ioctl(this.file, RequestCode.SET_INTERFACE, ifr);
         }
     }
 
-    public long send(byte[] bytes) throws IOException {
+    public long transmit(byte[] bytes) {
         return CRuntimeWrapper.write(this.file, bytes, bytes.length);
     }
 
-    public long receive(byte[] bytes) throws IOException {
+    public long receive(byte[] bytes) {
         return CRuntimeWrapper.read(this.file, bytes, bytes.length);
     }
 
@@ -50,8 +46,8 @@ public class NetworkTunnel implements AutoCloseable {
         return this.name;
     }
 
-    public RequestMode mode() {
-        return this.mode;
+    public NetworkTunnelDeviceFlag device() {
+        return this.device;
     }
 
     @Override
@@ -60,11 +56,11 @@ public class NetworkTunnel implements AutoCloseable {
     }
 
     public static void main(String[] args) {
-        try (NetworkTunnel nic = new NetworkTunnel("tun0", RequestMode.TUNNEL)) {
+        try (NetworkTunnel nic = new NetworkTunnel("tun0", NetworkTunnelDeviceFlag.NETWORK_TUNNEL)) {
             byte[] buf = new byte[1504];
             long read = nic.receive(buf);
             System.out.printf("Read %d bytes: %s", read, new String(buf));
-        } catch (Exception e) {
+        } catch (Error e) {
             e.printStackTrace(System.out);
         }
     }
