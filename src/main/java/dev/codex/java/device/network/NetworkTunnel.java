@@ -4,6 +4,7 @@ import dev.codex.java.wrapper.runtime.*;
 import dev.codex.java.wrapper.type.Error;
 
 import java.nio.charset.Charset;
+import java.util.Arrays;
 
 import static dev.codex.java.wrapper.runtime.NetworkTunnelInterfaceFlag.NO_PACKET_INFORMATION;
 
@@ -59,7 +60,7 @@ public class NetworkTunnel implements AutoCloseable {
         try (NetworkTunnel nic = new NetworkTunnel("tun0", NetworkTunnelDeviceFlag.NETWORK_TUNNEL)) {
             byte[] buf = new byte[1504];
             long read = nic.receive(buf);
-            System.out.printf("Read %d bytes: %s", read, new String(buf));
+            System.out.printf("Read %d bytes: %s", read, Arrays.toString(buf));
         } catch (Error e) {
             e.printStackTrace(System.out);
         }
