@@ -1,14 +1,24 @@
 package dev.codex.java.device.network;
 
+import dev.codex.java.CRuntimeWrapperAnchor;
+import dev.codex.java.wrapper.library.NativeLibraryLoader;
 import dev.codex.java.wrapper.runtime.*;
 import dev.codex.java.wrapper.type.Error;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 
 import static dev.codex.java.wrapper.runtime.NetworkTunnelInterfaceFlag.NO_PACKET_INFORMATION;
 
 public class NetworkTunnel implements AutoCloseable {
+    static {
+        try {
+            NativeLibraryLoader.load(CRuntimeWrapperAnchor.class, "libCRuntimeWrapper.so");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private final FileDescriptor file;
     private final String name;
     private final NetworkTunnelDeviceFlag device;
@@ -57,12 +67,6 @@ public class NetworkTunnel implements AutoCloseable {
     }
 
     public static void main(String[] args) {
-        try (NetworkTunnel nic = new NetworkTunnel("tun0", NetworkTunnelDeviceFlag.NETWORK_TUNNEL)) {
-            byte[] buf = new byte[1504];
-            long read = nic.receive(buf);
-            System.out.printf("Read %d bytes: %s", read, Arrays.toString(buf));
-        } catch (Error e) {
-            e.printStackTrace(System.out);
-        }
+        CRuntimeWrapper.printf("Hello, World");
     }
 }
