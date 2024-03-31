@@ -6,7 +6,7 @@
 
     <parent>
         <groupId>dev.codex.java.maven</groupId>
-        <artifactId>parent-jar-packaging</artifactId>
+        <artifactId>jar-packaging-parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
@@ -22,12 +22,12 @@
     <dependencies>
         <dependency>
             <groupId>dev.codex.java</groupId>
-            <artifactId>c-runtime-wrapper</artifactId>
+            <artifactId>native-runtime-wrapper</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>dev.codex.java</groupId>
-            <artifactId>c-runtime-wrapper</artifactId>
+            <artifactId>native-runtime-wrapper</artifactId>
             <version>1.0.0-SNAPSHOT</version>
             <classifier>native</classifier>
         </dependency>

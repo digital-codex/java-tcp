@@ -1,22 +1,17 @@
 package dev.codex.java.device.network;
 
-import dev.codex.java.CRuntimeWrapperAnchor;
+import dev.codex.java.NativeRuntimeWrapperAnchor;
 import dev.codex.java.wrapper.library.NativeLibraryLoader;
 import dev.codex.java.wrapper.runtime.*;
 import dev.codex.java.wrapper.type.Error;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 
 import static dev.codex.java.wrapper.runtime.NetworkTunnelInterfaceFlag.NO_PACKET_INFORMATION;
 
 public class NetworkTunnel implements AutoCloseable {
     static {
-        try {
-            NativeLibraryLoader.load(CRuntimeWrapperAnchor.class, "libCRuntimeWrapper.so");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        NativeLibraryLoader.load(NativeRuntimeWrapperAnchor.class, "libNativeRuntimeWrapper.so");
     }
 
     private final FileDescriptor file;
@@ -28,8 +23,8 @@ public class NetworkTunnel implements AutoCloseable {
     }
 
     public NetworkTunnel(String name, NetworkTunnelDeviceFlag device, boolean packet_info) throws Error {
-        try (InterfaceRequest ifr = CRuntimeWrapper.malloc(InterfaceRequest.class)) {
-            this.file = CRuntimeWrapper.open("/dev/net/tun", AccessFlag.READ_WRITE);
+        try (InterfaceRequest ifr = NativeRuntimeWrapper.malloc(InterfaceRequest.class)) {
+            this.file = NativeRuntimeWrapper.open("/dev/net/tun", AccessFlag.READ_WRITE);
             this.name = name;
             this.device = device;
             ifr.setName(name.getBytes(Charset.defaultCharset()));
@@ -37,16 +32,16 @@ public class NetworkTunnel implements AutoCloseable {
             if (packet_info) {
                 ifr.addFlag(NO_PACKET_INFORMATION);
             }
-            CRuntimeWrapper.ioctl(this.file, RequestCode.SET_INTERFACE, ifr);
+            NativeRuntimeWrapper.ioctl(this.file, RequestCode.SET_INTERFACE, ifr);
         }
     }
 
     public long transmit(byte[] bytes) {
-        return CRuntimeWrapper.write(this.file, bytes, bytes.length);
+        return NativeRuntimeWrapper.write(this.file, bytes, bytes.length);
     }
 
     public long receive(byte[] bytes) {
-        return CRuntimeWrapper.read(this.file, bytes, bytes.length);
+        return NativeRuntimeWrapper.read(this.file, bytes, bytes.length);
     }
 
     public FileDescriptor fd() {
@@ -63,10 +58,10 @@ public class NetworkTunnel implements AutoCloseable {
 
     @Override
     public void close() {
-        CRuntimeWrapper.close(this.file);
+        NativeRuntimeWrapper.close(this.file);
     }
 
     public static void main(String[] args) {
-        CRuntimeWrapper.printf("Hello, World");
+        NativeRuntimeWrapper.println("Hello, World");
     }
 }
